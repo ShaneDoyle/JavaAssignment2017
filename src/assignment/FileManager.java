@@ -12,7 +12,9 @@ public class FileManager
 	Scanner myScanner;
     PrintWriter pwInput;
     
-	public static String[] BadWords = new String[10];
+    //Variables for "Screen.java"
+    public static int lines; 						  //Counts amount of lines.
+	public static String[] BadWords = new String[10]; //Puts all bad words into an array.
 
 
 	// Constructor
@@ -23,14 +25,14 @@ public class FileManager
 		
 	}
 	
-	// get a connection to the file
+	//Get a connection to the file
 	void connectToFile()
 	{
 		fileExample = new File(fileName);
 	}
 
-	int j = 0;
 	// Read the file, returning a string of lines
+	int j = 0;
     void readFile()
     {
 	    try
@@ -42,6 +44,7 @@ public class FileManager
 				 BadWords[j]  = myScanner.nextLine();
 			     System.out.println(BadWords[j]);
 			     j++;
+			     lines++;
 			    }
 		}
 		catch (FileNotFoundException e)

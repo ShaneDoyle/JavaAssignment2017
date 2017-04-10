@@ -11,6 +11,9 @@ import javax.swing.JTextField;
 import javax.swing.JRadioButton;
 import javax.swing.*;
 
+import java.util.Arrays;
+import java.util.regex.Pattern;
+
 import assignment.FileManager;
 
 public class Screen extends JFrame implements ActionListener
@@ -26,7 +29,7 @@ public class Screen extends JFrame implements ActionListener
    JComboBox NameList = new JComboBox();
    JLabel picture;
    
-   
+  
    
    //Constructor
    Screen(String title)
@@ -65,34 +68,31 @@ public class Screen extends JFrame implements ActionListener
 	   f1.readFile();
 	   f1.closeReadFile();
    }
-
+   
    //Event Handler
    public void actionPerformed(ActionEvent button)
    {
+	   
 	   if(button.getSource() == button1)
 	   {
 		   
-		   int i = 0;
-		   
 		   String input = textfield1.getText();
 		   label2.setText(input);
-		  
+			
+		   //Compares strings to the "abuse.txt" file.
 		   String search = FileManager.BadWords[0];
-		   System.out.println(search);
-		   while (i <=  4)
-		   {
-
-		   if (input.toLowerCase().indexOf(search.toLowerCase()) != -1 ) 
-		   {
-			   label2.setText("Abusive text detected.");
-		   } 
-		   else 
-		   {
-			   label2.setText("No abuse detected.");
-		   }
-		   i++;
-		   
-		   }
+	       for(int j=1; j<FileManager.lines; j++)
+	       {
+	    	   if (input.toLowerCase().indexOf(search.toLowerCase()) != -1 ) 
+	    	   {
+	    		   label2.setText("Abusive text detected.");
+	    	   } 
+	    	   else 
+	    	   {
+	    		   label2.setText("No abuse detected.");
+	    		   search = FileManager.BadWords[j];
+	    	   }
+	       }
 	   }
    }
 }
