@@ -1,5 +1,6 @@
 package assignment;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
@@ -8,6 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
 import javax.swing.JRadioButton;
 import javax.swing.*;
 import java.io.*;
@@ -22,12 +24,15 @@ public class Screen extends JFrame implements ActionListener
 	
    JButton button1;
    JButton button2;
+   JButton button3;
    JTextField textfield1;
    JTextField textfield2;
+   JTextField textfield3;
    JLabel label1;
    JLabel label2;
    JLabel label3;
    static JLabel label4;
+   JLabel label5;
    JRadioButton radiobutton1;
    
    JComboBox NameList = new JComboBox();
@@ -83,6 +88,21 @@ public class Screen extends JFrame implements ActionListener
 	   label4.setBounds(150,75,500,25);
 	   panel.add(label4);
 	   
+	   //Scan social media posts.
+	   button3 = new JButton("Scan Posts");
+	   button3.setBounds(750,50,200,25);
+	   panel.add(button3);
+	   button3.addActionListener(this);
+	   
+	   label5 = new JLabel("Scan posts.");
+	   label5.setBounds(750,0,500,25);
+	   panel.add(label5);
+	   
+	   textfield3 = new JTextField (10);
+	   textfield3.setBounds(750,20,200,25);
+	   panel.add(textfield3);
+	   
+	   
 	   //Open and close file.
 	   FileManager f1 = new FileManager("abuse.txt");
 	   f1.connectToFile();
@@ -134,6 +154,18 @@ public class Screen extends JFrame implements ActionListener
 		   {
 			e.printStackTrace();
 		   }
+	   }
+	   
+	   
+	   
+	   //Scan posts in "posts.txt" for abusive content.
+	   if(button.getSource() == button3)
+	   {
+		   FileManager f1 = new FileManager("posts.txt");
+		   f1.connectToFile();
+		   f1.scanPost();
+
+		   
 	   }
    }
 }
