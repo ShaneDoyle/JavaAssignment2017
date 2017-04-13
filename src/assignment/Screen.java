@@ -13,7 +13,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.JRadioButton;
 import javax.swing.*;
 import java.io.*;
-
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
@@ -155,8 +154,6 @@ public class Screen extends JFrame implements ActionListener
 			e.printStackTrace();
 		   }
 	   }
-	   
-	   
 	   
 	   //Scan posts in "posts.txt" for abusive content.
 	   if(button.getSource() == button3)

@@ -22,16 +22,12 @@ public class FileManager
 	public static String[] BadWords = new String[25]; //Puts all bad words into an array.
 	public static String[] PostScan = new String[250];
 	public static String[] PostWord = new String[250];
-	public static int BadWordCount; //
+	public static int BadWordCount; //Counts number of bad words in "abuse.txt"
 	
-
-
 	// Constructor
 	FileManager (String fileName)
 	{
-		
 		this.fileName = fileName;
-		
 	}
 	
 	//Get a connection to the file
@@ -62,11 +58,6 @@ public class FileManager
 		{
 			System.out.println("run time error " + e.getMessage());
 		}
-	    /*finally
-	    {
-	        return values;
-	    }
-	    */
     }
     
 	//Get hold of a Print writer object
@@ -90,25 +81,15 @@ public class FileManager
        pwInput.println(line);
     }	
     
-    
-    
-    
-    
     void closeReadFile()
     {
 		 myScanner.close();
     }
 
-    
-    
-    
     void closeWriteFile()
     {
 		 pwInput.close();
     }
-   
-    
-    
     
     //Append text to a file.
     void append(String input) throws IOException
@@ -146,10 +127,12 @@ public class FileManager
     		fileWriter.write(input);
     		Screen.label4.setText("Word inserted!");
     	}
+    	
 		catch (FileNotFoundException e)
 		{
 			System.out.println("run time error " + e.getMessage());
 		}
+    	
     	finally
     	{
     		if (fileWriter != null)
@@ -162,8 +145,10 @@ public class FileManager
     //Scan Posts
     void scanPost()
     {
-    	int AbuseCount = 0; //Counts number of words that could are abusive.
+    	String test;
     	int i = 0;
+    	int PostNum = 1;
+    	int AbuseCount = 0; //Counts number of words that could are abusive.
     	int PostWordCount = 0; //Counts number of words in the following post.
 	    try
 		{
@@ -171,43 +156,68 @@ public class FileManager
 			while (myScanner.hasNextLine())
 			 {
 				PostScan[i]  = myScanner.nextLine();
-				if (PostScan[i].isEmpty())
-				{
-					return;
-				}
+				//System.out.println(PostScan[i]);
 				
 				//ArrayString into a string.
 				String s = PostScan[i];
 				
 				//Split string into words.
-				String[] words = s.split(" ");    
+				String[] words = s.split(" ");
 				
-				 
-				 //Scan each word individually for the amount of words.
-				 for ( String ss : words) 
-				 {
+				for ( String ss : words) 
+				{
 					PostWordCount++;
-					//System.out.println(ss);
-					
-					
+				}
+				
+				for ( String ss : words) 
+				{
 					for (int j = 0; j < BadWordCount; j++ )
 					{
-				    	   if (ss.toLowerCase().indexOf(BadWords[j].toLowerCase()) != -1 )  //Input matches text file.
-				    	   {
-				    		   //System.out.println("Abusive.");
-				    		   AbuseCount++;
-				    		   j = BadWordCount;
+						if (ss.toLowerCase().indexOf(BadWords[j].toLowerCase()) != -1 )  //Input matches text file.
+				    	{
+							AbuseCount++;
+				    		j = BadWordCount;
 				    		   
-				    	   } 
-				    	   else
-				    	   {
+				    	} 
+				    	else
+				    	{
 				    		   //Do nothing if word isn't abusive.
-				    	   }
-				    	   
+				    	}
 					}
-				 }
-				 
+				}
+				
+					//When blank line is detected.
+					if(PostScan[i].isEmpty())
+					{
+						PostWordCount -= 1;
+						//If no words are detected, 
+						if(PostWordCount != 0 )
+						{
+							System.out.println("Post:" + PostNum + " " + PostWordCount + " words & " + AbuseCount + " abusive words");
+							PostWordCount = 0;
+							AbuseCount = 0;
+							PostNum++;
+						}
+						else
+						{
+							
+						}
+				    	
+					}
+					
+					//If no next line is detected (EOF)
+					if(!myScanner.hasNextLine())
+					{
+						//System.out.println("EOF");
+				    	System.out.println("Post:" + PostNum + " " + PostWordCount + " words & " + AbuseCount + " abusive words");
+						PostNum++;
+					}
+				
+				
 			 }
+
+
+					
 		}
 		catch (FileNotFoundException e)
 		{
@@ -215,9 +225,8 @@ public class FileManager
 		}
 	    finally
 	    {
-	    	System.out.println("This post contains " + PostWordCount + " words in it.");
-	    	System.out.println("This post contains " + AbuseCount + " potentially abusive words in it.");
+	    	
+
 	    }
-	    
     }
 }
