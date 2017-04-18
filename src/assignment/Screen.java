@@ -24,6 +24,10 @@ public class Screen extends JFrame implements ActionListener
    JButton button1;
    JButton button2;
    JButton button3;
+   
+   JButton button4;
+   JButton button5;
+   JButton button6;
    JTextField textfield1;
    JTextField textfield2;
    JTextField textfield3;
@@ -35,7 +39,10 @@ public class Screen extends JFrame implements ActionListener
    JRadioButton radiobutton1;
    
    static JTextArea jta;
+   static JTextArea jta2;
    static JScrollPane jsp;
+   static JScrollPane jsp2;
+   int Verify = 0 ; //Verifying suspicious words.
    
    JComboBox NameList = new JComboBox();
    JLabel picture;
@@ -70,28 +77,51 @@ public class Screen extends JFrame implements ActionListener
 	   textfield1 = new JTextField (10);
 	   textfield1.setBounds(450,20,200,25);
 	   panel.add(textfield1);
-	   
-	   button1 = new JButton("Enter!");
-	   button1.setBounds(450,50,200,25);
+	   */
+	   button1 = new JButton("Verify Suspicious Words");
+	   button1.setBounds(100,270,200,25);
 	   panel.add(button1);
-	   button1.addActionListener(this);*/
+	   button1.addActionListener(this);
+	   
+	   button4 = new JButton("Abusive");
+	   button4.setBounds(50,350,89,25);
+	   panel.add(button4);
+	   button4.addActionListener(this);
+	   
+	   button5 = new JButton("Safe");
+	   button5.setBounds(150,350,89,25);
+	   panel.add(button5);
+	   button5.addActionListener(this);
+	   
+	   button6 = new JButton("Ignore");
+	   button6.setBounds(250,350,89,25);
+	   panel.add(button6);
+	   button6.addActionListener(this);
+	   
+	   jta2 = new JTextArea();
+	   JScrollPane scroll2 = new JScrollPane (jta2);
+	   scroll2.setBounds(50,300,290,50);
+	   jta2.setEditable(false);
+	  // textArea.setText();
+	   panel.add(scroll2);
+	   panel.setVisible (true);
 	   
 	   //Adding new bad words
 	   label3 = new JLabel("Add new bad word!");
-	   label3.setBounds(150,400,400,25);
+	   label3.setBounds(150,600,400,25);
 	   panel.add(label3);
 	   
 	   textfield2 = new JTextField (10);
-	   textfield2.setBounds(150,425,150,25);
+	   textfield2.setBounds(150,625,150,25);
 	   panel.add(textfield2);
 	   
 	   button2 = new JButton("Insert Word!");
-	   button2.setBounds(150,450,150,25);
+	   button2.setBounds(150,650,150,25);
 	   panel.add(button2);
 	   button2.addActionListener(this);
 	   
 	   label4 = new JLabel();
-	   label4.setBounds(150,75,500,25);
+	   label4.setBounds(150,675,500,25);
 	   panel.add(label4);
 	   
 	   //Scan social media posts.
@@ -128,30 +158,138 @@ public class Screen extends JFrame implements ActionListener
    }
    
 	   //Event Handler
-	   public void actionPerformed(ActionEvent button)
-	   {
+   		boolean SuspectButtons = false; //Users can't mark suspicious words without clicking  the "Verify" button.
+   		public void actionPerformed(ActionEvent button)
+   		{
+   			FileManager f3 = new FileManager("suspect.txt");
 		   
-		   //Abuse detector.
-		   if(button.getSource() == button1)
-		   {
-			   String input = textfield1.getText();
-			   label2.setText(input);
-				
-			   //Compares strings to the "abuse.txt" file.
-			   String search = FileManager.BadWords[0];
-		       for(int j=0; j<FileManager.lines+1; j++)
-		       {
-		    	   if (input.toLowerCase().contains(search.toLowerCase()))  //Input matches text file.
-		    	   {
-		    		   label2.setText("Abusive text detected. Word detected: " + input);
-		    	   } 
-		    	   else //No match.
-		    	   {
-		    		   label2.setText("No abuse detected.");
-		    		   search = FileManager.BadWords[j];
-		    	   }
-		       }
+
+		   //Verify Suspicious Words.
+   			if(button.getSource() == button1)
+   			{
+			   SuspectButtons = true;
+			   f3.connectToFile();
+			   f3.getFileWriter();
+			   for(int i = 0; i!= FileManager.Evaluate; i++)
+			   {
+				   f3.writeLineToFile(FileManager.SuspectWordsEvaluate[i]);
+			   }
+			   f3.closeWriteFile();
+			   
+			   Screen.jta2.setText("");
+			   Screen.jta2.append(FileManager.SuspectWordsEvaluate[Verify]);
 		   }
+		   
+   		//User marks the word as "Abusive".
+		   if(button.getSource() == button4)
+		   {
+			   if (SuspectButtons == false)
+			   {
+				   Screen.jta2.setText("Please select verify button above.");
+				   return;
+			   }
+			   else if (Verify >= FileManager.Evaluate)
+			   {
+				   Screen.jta2.setText("No more words left!");
+			   }
+
+			   else
+			   {
+				 //Read File
+				   FileManager f1 = new FileManager("abuse.txt");
+				   f1.connectToFile();
+				   f1.readFile();
+
+				   try 
+				   {
+					   f1.AbuseAppend((FileManager.SuspectWordsEvaluate[Verify]));
+				   } 
+				   catch (IOException e) 
+				   {
+					   e.printStackTrace();
+				   }
+			   
+				   finally
+				   {
+					   	Screen.jta2.setText("");
+					   	Screen.jta2.append(FileManager.SuspectWordsEvaluate[Verify]);
+				   		Verify++;
+				   		f1.readFile();
+				   		if (Verify == FileManager.Evaluate)
+				   		{
+				   			Screen.jta2.setText("No more words left!");
+				   		}
+				   }
+			   }
+		   }
+		   
+		   //User marks the word as "Safe".
+		   if(button.getSource() == button5)
+		   {
+			   if (SuspectButtons == false)
+			   {
+				   Screen.jta2.setText("Please select verify button above.");
+				   return;
+			   }
+			   else if (Verify >= FileManager.Evaluate)
+			   {
+				   Screen.jta2.setText("No more words left!");
+			   }
+
+			   else
+			   {
+				   //Read File
+				   FileManager f2 = new FileManager("safe.txt");
+				   f2.connectToFile();
+				   f2.readFile2();
+
+				   try 
+				   {
+					   f2.SafeAppend((FileManager.SuspectWordsEvaluate[Verify]));
+				   } 
+				   catch (IOException e) 
+				   {
+					   e.printStackTrace();
+				   }
+			   
+				   finally
+				   {
+					   Verify++;
+					   	Screen.jta2.setText("");
+					   	Screen.jta2.append(FileManager.SuspectWordsEvaluate[Verify]);
+
+				   		f2.readFile2();
+				   		if (Verify == FileManager.Evaluate)
+				   		{
+				   			Screen.jta2.setText("No more words left!");
+				   		}
+				   }
+			   }
+		   }
+		   
+		   if(button.getSource() == button6)
+		   {
+			   if (SuspectButtons == false)
+			   {
+				   Screen.jta2.setText("Please select verify button above.");
+				   return;
+			   }
+			   else if (Verify >= FileManager.Evaluate)
+			   {
+				   Screen.jta2.setText("No more words left!");
+			   }
+			   else
+			   {
+				   
+			   Verify++;
+			   Screen.jta2.append(FileManager.SuspectWordsEvaluate[Verify]);
+		   		if (Verify == FileManager.Evaluate)
+		   		{
+		   			Screen.jta2.setText("No more words left!");
+		   		}
+			   }
+		   }
+		   
 	   
 	   //Add new bad word.
 	   if(button.getSource() == button2)
@@ -165,7 +303,7 @@ public class Screen extends JFrame implements ActionListener
 		   f1.readFile();
 		   try 
 		   {
-			   f1.append(input);
+			   f1.AbuseAppend(input);
 		   } 
 		   catch (IOException e) 
 		   {
@@ -176,6 +314,7 @@ public class Screen extends JFrame implements ActionListener
 	   //Scan posts in "posts.txt" for abusive content.
 	   if(button.getSource() == button3)
 	   {
+		   Screen.jta2.setText(""); //Clear verify
 		   FileManager f1 = new FileManager("posts.txt");
 		   Screen.jta.setText(""); //Clears text.
 		   f1.connectToFile();
