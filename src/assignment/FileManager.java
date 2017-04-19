@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.Scanner;
 import java.io.IOException;
 import java.util.Arrays;
@@ -18,7 +19,6 @@ public class FileManager
     PrintWriter pwInput;
     
     //Variables for "Screen.java"
-    public static int lines; 						  //Counts amount of lines.
 	public static String[] BadWords = new String[25000]; //Puts all bad words into an array.
 	public static String[] SafeWords = new String[25000]; //Safe words that are ignored by scanner.
 	public static String[] SuspectWords = new String [25000]; //Suspicious words are put in here and scanned again.
@@ -57,7 +57,6 @@ public class FileManager
 				 BadWordCount++;
 			     //System.out.println(BadWords[j]);
 			     j++;
-			     lines++;
 			 }
 			System.out.println("Bad Word Count: " + BadWordCount);
 		}
@@ -161,8 +160,8 @@ public class FileManager
     	{
     		File file = new File("safe.txt");
     		fileWriter = new FileWriter(file, true);
-    		fileWriter.write("\n");
     		fileWriter.write(input);
+    		fileWriter.write("\n");
     		Screen.label4.setText("Word inserted!");
     	}
     	
@@ -188,10 +187,10 @@ public class FileManager
     	boolean check = false; //Ensures a word doesn't get counted twice for suspicious and abusive.
     	int i = 0;
     	int bad = 0;
-    	int PostNum = 1;
+    	int PostNum = 0;
     	int SafeWord = 0;
     	float AbuseCount = 0; //Counts number of words that program detects as abusive.
-    	int SuspectCount = 0; //Counts number of words that are suspicious.
+    	float SuspectCount = 0; //Counts number of words that are suspicious.
     	float PostWordCount = 0; //Counts number of words in the following post.
 	    try
 		{
@@ -230,7 +229,7 @@ public class FileManager
 					}
 					
 					//Begin checking for bad words.
-					for (int j = 0; j < BadWordCount; j++ )
+					for (int j = 0; j != BadWordCount; j++ )
 					{
 						
 						if (SafeWord == 1)
@@ -240,33 +239,41 @@ public class FileManager
 						}
 						
 						//If word fully matches bad word in "abuse.txt"
-						else if(ss.toLowerCase().equals(BadWords[j].toLowerCase()))
+						if(ss.toLowerCase().equals(BadWords[j].toLowerCase()))
 				    	{
 				    		   AbuseCount++;
+				    		   j = BadWordCount;
+				    		   check = true;
 				    		   break;
 				    	}
 						
 						//If elements of bad word in "abuse.txt" are in a word (suspicious words).
-				    	else if (ss.toLowerCase().contains(BadWords[j].toLowerCase()))
+						if (ss.toLowerCase().contains(BadWords[j].toLowerCase()))
 				    	{
-				    			for (int l = 0; l < BadWordCount; l++)
-				    			{
-				    				if (ss.toLowerCase().equals(BadWords[l].toLowerCase()))
-				    				{
-				    					AbuseCount++;
-				    					SuspectCount--;
-				    					break;
-				    				}
-				    			}
-				    			SuspectWords[bad] = ss;
-				    			SuspectWordsEvaluate[Evaluate] = ss;
-				    			Evaluate++;
-				    			bad++;
-				    			SuspectCount++;
-				    			break;
-				    	}
+					    		SuspectWords[bad] = ss;
+					    		SuspectWordsEvaluate[Evaluate] = ss;
+					    		Evaluate++;
+					    		bad++;
+					    		SuspectCount++;
+					    		System.out.println(Evaluate);
+					    		
+					    		for (int l = 0; l < BadWordCount; l++)
+					    		{
+					    			if (ss.toLowerCase().equals(BadWords[l].toLowerCase()))
+					    			{
+					    				System.out.println(ss);
+					    				SuspectCount--;
+					    				Evaluate--;
+					    				bad--;
+					    				l = BadWordCount;
+							    		SuspectWords[bad] = "";
+							    		SuspectWordsEvaluate[Evaluate] = "";
+							    		System.out.println(Evaluate);
+					    			}
+					    		}
+				    		}
 						
-					}
+						}
 				}
 				
 				
@@ -277,33 +284,25 @@ public class FileManager
 						PostWordCount -= 1;
 						if(PostWordCount != 0 )
 						{
-							System.out.println("Post " + PostNum + ": " + PostWordCount + " words & " + AbuseCount + " abusive words & " + SuspectCount + " suspicious words" );
-							Screen.jta.append("Post " + PostNum + ": " + PostWordCount + " words + " + AbuseCount + " abusive words + " + SuspectCount + " suspicious words \n");
-							percentage = (AbuseCount/PostWordCount)*100;
-							Screen.jta.append(percentage + "% of the words in this post are potentially offensive\n\n");
-							System.out.println(percentage);
+							PostNum++;
+							results(PostNum, PostWordCount, AbuseCount, SuspectCount);
 							PostWordCount = 0;
 							AbuseCount = 0;
 							SuspectCount = 0;
-							PostNum++;
 						}
-						else
-						{
-							
-							
-						}
-				    	
 					}
 					
 					//If no next line is detected (EOF)
 					if(!myScanner.hasNextLine())
 					{
-						//System.out.println("EOF");
-				    	System.out.println("Post:" + PostNum + " " + PostWordCount + " words & " + AbuseCount + " abusive words & " + SuspectCount + " suspicious words" );
-				    	Screen.jta.append("Post " + PostNum + ": " + PostWordCount + " words + " + AbuseCount + " abusive words + " + SuspectCount + " suspicious words \n\n");
-						percentage = (AbuseCount/PostWordCount)*100;
-						Screen.jta.append(percentage + "% of the words in this post are potentially offensive\n\n");
-						PostNum++;
+						if(PostWordCount != 0 )
+						{
+							PostNum++;
+							results(PostNum, PostWordCount, AbuseCount, SuspectCount);
+							PostWordCount = 0;
+							AbuseCount = 0;
+							SuspectCount = 0;
+						}
 					}			
 			 }			
 		}
@@ -313,8 +312,40 @@ public class FileManager
 		}
 	    finally
 	    {
-	    	
-
+	    	//Do nothing
 	    }
+    }
+    
+    void results(int PostNum, float PostWordCount, float AbuseCount, float SuspectCount)
+    {
+		System.out.println("Post:" + PostNum + " " + PostWordCount + " words & " + AbuseCount + " abusive words & " + SuspectCount + " suspicious words" );
+		Screen.jta.append("Post " + PostNum + ":\n" + (int)PostWordCount + " words + " + (int)AbuseCount + " abusive words + " + (int)SuspectCount + " suspicious words \n");
+		
+		//Used to display numbers to 2 decimal places.
+		DecimalFormat df = new DecimalFormat("#.00");
+		
+		//Display results percentages.
+		float results = (AbuseCount * 200 / PostWordCount );
+		if(results == 0)
+		{
+			Screen.jta.append("Results: 0% offensive.\n");
+		}
+		else
+		{
+	    	Screen.jta.append("Results: " + (df.format(results)) + "% offensive.\n");
+		}
+    	
+    	if (results == 0)
+    	{
+        	Screen.jta.append("No abuse detected, this sentence is not abusive!\n\n");
+    	}
+    	else if (results < 5)
+    	{
+        	Screen.jta.append("Small amount of abusive words detected. This sentence\nis probably not abusive!\n\n");
+    	}
+    	else if (results < 10)
+    	{
+        	Screen.jta.append("Traces of abusive content have been found. This is sentence \n shouldn't be abusive!\n\n");
+    	}
     }
 }

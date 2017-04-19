@@ -23,11 +23,20 @@ public class Screen extends JFrame implements ActionListener
 	
    JButton button1;
    JButton button2;
+  
+   //Verify Suspicious
    JButton button3;
    
+   //Verify Options
    JButton button4;
    JButton button5;
    JButton button6;
+   
+   //Edit Post
+   JButton button7;
+   ProcessBuilder pb;
+   
+   
    JTextField textfield1;
    JTextField textfield2;
    JTextField textfield3;
@@ -147,6 +156,13 @@ public class Screen extends JFrame implements ActionListener
 	   //panel.add(textfield3);
 	   
 	   
+	   button7 = new JButton("Edit Posts");
+	   button7.setBounds(145,40,110,25);
+	   panel.add(button7);
+	   button7.addActionListener(this);
+	   
+	   //Edit Post
+	   
 	   //Open and close file.
 	   FileManager f1 = new FileManager("abuse.txt");
 	   FileManager f2 = new FileManager("safe.txt");
@@ -234,6 +250,7 @@ public class Screen extends JFrame implements ActionListener
 			   else if (Verify >= FileManager.Evaluate)
 			   {
 				   Screen.jta2.setText("No more words left!");
+				   FileManager.Evaluate = 0;
 			   }
 
 			   else
@@ -267,6 +284,7 @@ public class Screen extends JFrame implements ActionListener
 			   }
 		   }
 		   
+		   //Users that are unsure if a word is safe or abusive can skip it.
 		   if(button.getSource() == button6)
 		   {
 			   if (SuspectButtons == false)
@@ -316,10 +334,33 @@ public class Screen extends JFrame implements ActionListener
 	   {
 		   Screen.jta2.setText(""); //Clear verify
 		   FileManager f1 = new FileManager("posts.txt");
+		   
+		   //Refresh "safe.txt"
+		   FileManager f2 = new FileManager("safe.txt");
+		   f2.connectToFile();
+		   f2.readFile2();
+		   f2.closeReadFile();
+		   
+		   FileManager.Evaluate = 0;
+		   	
 		   Screen.jta.setText(""); //Clears text.
 		   f1.connectToFile();
 		   f1.scanPost();
-		   
+		   f1.closeReadFile();
 	   }
+	   
+	   //Scan posts in "posts.txt" for abusive content.
+	   if(button.getSource() == button7)
+	   {
+		   pb = new ProcessBuilder("notepad.exe", "posts.txt");
+		   try 
+		   {
+			   pb.start();
+		   } 
+		   catch (IOException e) 
+		   {
+			   e.printStackTrace();
+		   }
+	   }	
    }
 }
