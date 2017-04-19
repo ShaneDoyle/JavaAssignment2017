@@ -1,5 +1,6 @@
 package assignment;
 
+import java.awt.Font;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,6 +8,10 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Scanner;
+
+import com.sun.org.apache.xpath.internal.operations.Equals;
+import com.sun.prism.paint.Color;
+
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -15,7 +20,7 @@ public class FileManager
 	String fileName;
 	File fileExample;
 	Scanner myScanner;
-	Scanner myScanner2;
+	Scanner duplicate;
     PrintWriter pwInput;
     
     //Variables for "Screen.java"
@@ -24,6 +29,7 @@ public class FileManager
 	public static String[] SuspectWords = new String [25000]; //Suspicious words are put in here and scanned again.
 	public static String[] SuspectWordsEvaluate = new String [25000]; //Suspicious words that will later be evaluated by the user.
 	public static int Evaluate = 0; //Tracks suspicious that need evaluation.
+	int Duplicate = 0; //Duplicate suspicious words.
 	public static String[] PostScan = new String[250];
 	public static String[] PostWord = new String[250];
 	public static int BadWordCount = 0; //Counts number of bad words in "abuse.txt"
@@ -195,6 +201,7 @@ public class FileManager
 	    try
 		{
 	    	myScanner = new Scanner(fileExample); 
+	    	duplicate = new Scanner(fileExample); 
 			while (myScanner.hasNextLine())
 			 {
 				
@@ -250,13 +257,29 @@ public class FileManager
 						//If elements of bad word in "abuse.txt" are in a word (suspicious words).
 						if (ss.toLowerCase().contains(BadWords[j].toLowerCase()))
 				    	{
+							
+							//Scans for duplicate suspicious words.
+							for (int k = 0; k != Evaluate; k++)
+							{
+								if(ss.toLowerCase().equals(SuspectWordsEvaluate[k].toLowerCase()))
+								{
+									SuspectWordsEvaluate[k] = "";
+									Duplicate++;
+									break;
+								}
+								else
+								{
+									
+								}
+							}
+							
 					    		SuspectWords[bad] = ss;
 					    		SuspectWordsEvaluate[Evaluate] = ss;
 					    		Evaluate++;
 					    		bad++;
 					    		SuspectCount++;
 					    		System.out.println(Evaluate);
-					    		
+
 					    		for (int l = 0; l < BadWordCount; l++)
 					    		{
 					    			if (ss.toLowerCase().equals(BadWords[l].toLowerCase()))
@@ -272,10 +295,12 @@ public class FileManager
 					    			}
 					    		}
 				    		}
-						
 						}
-				}
+					}
 				
+				
+			
+								
 				
 					//When blank line is detected.
 					float percentage;
@@ -318,34 +343,111 @@ public class FileManager
     
     void results(int PostNum, float PostWordCount, float AbuseCount, float SuspectCount)
     {
-		System.out.println("Post:" + PostNum + " " + PostWordCount + " words & " + AbuseCount + " abusive words & " + SuspectCount + " suspicious words" );
-		Screen.jta.append("Post " + PostNum + ":\n" + (int)PostWordCount + " words + " + (int)AbuseCount + " abusive words + " + (int)SuspectCount + " suspicious words \n");
-		
+		float results = (AbuseCount * 200 / PostWordCount );
 		//Used to display numbers to 2 decimal places.
 		DecimalFormat df = new DecimalFormat("#.00");
-		
-		//Display results percentages.
-		float results = (AbuseCount * 200 / PostWordCount );
-		if(results == 0)
-		{
-			Screen.jta.append("Results: 0% offensive.\n");
-		}
-		else
-		{
-	    	Screen.jta.append("Results: " + (df.format(results)) + "% offensive.\n");
-		}
+    	if (Screen.simplecheck == false && Screen.childcheck == false)
+    	{
+    		
+    		System.out.println("Post:" + PostNum + " " + PostWordCount + " words & " + AbuseCount + " abusive words & " + SuspectCount + " suspicious words" );
+    		Screen.jta.append("Post " + PostNum + ":\n" + (int)PostWordCount + " words + " + (int)AbuseCount + " abusive words + " + (int)SuspectCount + " suspicious words \n");
+    		
+    		
+    		//Display results percentages.
+    		if(results == 0)
+    		{
+    			Screen.jta.append("Results: 0% offensive.\n");
+    		}
+    		else
+    		{
+    			Screen.jta.append("Results: " + (df.format(results)) + "% offensive.\n");
+    		}
     	
-    	if (results == 0)
-    	{
-        	Screen.jta.append("No abuse detected, this sentence is not abusive!\n\n");
+    		//Tell user if post is abusive.
+    		if (results == 0)
+    		{
+    			Screen.jta.append("No abuse detected, this sentence is not abusive!\n\n");
+    		}
+    		else if (results < 7.5)
+    		{
+    			Screen.jta.append("Traces amount of abusive words detected. This post\nis probably not abusive!\n\n");
+    		}
+    		else if (results < 15.0)
+    		{
+    			Screen.jta.append("Small of abusive content have been found. This post \n has a low chance of being abusive!\n\n");
+    		}
+    		else if (results < 25.0)
+    		{
+    			Screen.jta.append("Abusive content has been found. This post \n is probably abusive!\n\n");
+    		}
+    		else if (results < 50)
+    		{
+    			Screen.jta.append("Much abusive content has been found. This post \n is abusive!\n\n");
+    		}
+    		else
+    		{
+    			Screen.jta.append("A lot of abusive content has been found. This post \n is very abusive!\n\n");
+    		}
     	}
-    	else if (results < 5)
+    	
+    	//Child option.
+    	else if (Screen.childcheck == true)
     	{
-        	Screen.jta.append("Small amount of abusive words detected. This sentence\nis probably not abusive!\n\n");
+    		Screen.jta.append("Post " + PostNum + ": ");
+    		if (results != 0)
+    		{
+    			Screen.jta.append("Abusive content detected. Please check this post.");
+    		}
+    		else
+    		{
+    			Screen.jta.append("No abuse detected.");
+    		}
+    		Screen.jta.append("\n");
     	}
-    	else if (results < 10)
+    	
+    	
+    	else
     	{
-        	Screen.jta.append("Traces of abusive content have been found. This is sentence \n shouldn't be abusive!\n\n");
+    		Screen.jta.append("Post " + PostNum + ": "); 
+    		//Tell user if post is abusive.
+    		if (results == 0)
+    		{
+    			Screen.jta.append("No abuse.");
+    		}
+    		else if (results < 7.5)
+    		{
+    			Screen.jta.append("Traces of abuse.");
+    		}
+    		else if (results < 15.0)
+    		{
+    			Screen.jta.append("Small amount of abuse.");
+    		}
+    		else if (results < 25.0)
+    		{
+    			Screen.jta.append("Probably abusive.");
+    		}
+    		else if (results < 50)
+    		{
+    			Screen.jta.append("Abusive.");
+    		}
+    		else
+    		{
+    			Screen.jta.append("Very Aabusive");
+    		}
+    		if (results == 0)
+    		{
+    			Screen.jta.append(" (0% abusive)\n");
+    		}
+    		else
+    		{
+        		Screen.jta.append(" (" + (df.format(results)) + "% abusive)" + "\n");	
+    		}
+    	}
+    	//If suspicious words exist, prompt user to verify them.
+    	if (Evaluate > 0)
+    	{
+    		int Display = Evaluate - Duplicate;
+        	Screen.jta2.setText(Display + " word(s) need to be verified.\nPlease verify these and rescan the posts!\n");
     	}
     }
 }
