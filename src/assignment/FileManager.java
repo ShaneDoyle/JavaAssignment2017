@@ -24,6 +24,8 @@ public class FileManager
     PrintWriter pwInput;
     
     //Variables for "Screen.java"
+    public static boolean insertion = false;
+    
 	public static String[] BadWords = new String[25000]; //Puts all bad words into an array.
 	public static String[] SafeWords = new String[25000]; //Safe words that are ignored by scanner.
 	public static String[] SuspectWords = new String [25000]; //Suspicious words are put in here and scanned again.
@@ -56,11 +58,10 @@ public class FileManager
 	    try
 		{
 	    	myScanner = new Scanner(fileExample); 
-			while (myScanner.hasNextLine())
+			while (myScanner.hasNext())
 			 {
-			      
-				 BadWords[j]  = myScanner.nextLine();
-				 BadWordCount++;
+					BadWords[j]  = myScanner.next();
+					BadWordCount++;
 			     //System.out.println(BadWords[j]);
 			     j++;
 			 }
@@ -82,7 +83,6 @@ public class FileManager
 	    	myScanner = new Scanner(fileExample); 
 			while (myScanner.hasNextLine())
 			 {
-			      
 				 SafeWords[j]  = myScanner.nextLine();
 				 SafeWordCount++;
 			     //System.out.println(SafeWords[j]);
@@ -115,6 +115,46 @@ public class FileManager
     {
        System.out.println(line);
        pwInput.println(line);
+    }
+    
+	//Recreate "abuse.txt" for removing bad word.
+    void AbuseRemove(String input) throws IOException
+    {
+    	FileWriter fileWriter = null;
+		File file = new File("abuse.txt");
+    	
+		for(int j = 0 ; j != BadWordCount; j++)
+    	{
+    		if (!input.toLowerCase().equals(BadWords[j].toLowerCase()))
+    		{
+            	try
+            	{
+            		fileWriter = new FileWriter(file, true);
+            		fileWriter.write(BadWords[j]);
+            		if(j != BadWordCount-1)
+            		{
+                		fileWriter.write("\n");
+            		}
+            	}
+            	
+        		catch (FileNotFoundException e)
+        		{
+        			System.out.println("run time error " + e.getMessage());
+        		}
+            	
+            	finally
+            	{
+            		fileWriter.close();
+            	}
+    		}
+    		else
+    		{
+        		insertion = true;
+    		}
+
+    		
+    	}
+    	
     }	
     
     void closeReadFile()
@@ -131,28 +171,44 @@ public class FileManager
     void AbuseAppend(String input) throws IOException
     {
     	FileWriter fileWriter = null;
+    	boolean insert = false;
+    	int lastline = 0;
     	
-	    //Inserts user's word.
-    	try
+    	
+    	for(int j = 0 ; j != BadWordCount; j++)
     	{
-    		File file = new File("abuse.txt");
-    		fileWriter = new FileWriter(file, true);
-    		fileWriter.write("\n");
-    		fileWriter.write(input);
-    		Screen.label4.setText("Word inserted!");
+    		if (input.toLowerCase().equals(BadWords[j].toLowerCase()))
+    		{
+	    		Screen.label4.setText("Word already exists!");
+	    		insert = true;
+	    		lastline = j;
+    		}
     	}
     	
-		catch (FileNotFoundException e)
-		{
-			System.out.println("run time error " + e.getMessage());
-		}
-    	
-    	finally
+    	if (insert == false)
     	{
-    		if (fileWriter != null)
+        	try
+        	{
+        		File file = new File("abuse.txt");
+        		fileWriter = new FileWriter(file, true);
+        		fileWriter.write("\n");
+        		fileWriter.write(input);
+        		insertion = true;
+        	}
+        	
+    		catch (FileNotFoundException e)
     		{
-    			fileWriter.close();
+    			System.out.println("run time error " + e.getMessage());
     		}
+        	
+        	finally
+        	{
+        		if (fileWriter != null)
+        		{
+        			//Close filewriter.
+        			fileWriter.close();
+        		}
+        	}
     	}
     }
     
@@ -168,7 +224,6 @@ public class FileManager
     		fileWriter = new FileWriter(file, true);
     		fileWriter.write(input);
     		fileWriter.write("\n");
-    		Screen.label4.setText("Word inserted!");
     	}
     	
 		catch (FileNotFoundException e)
@@ -210,7 +265,14 @@ public class FileManager
 				
 				//ArrayString into a string.
 				String s = PostScan[i];
-				s = s.replace(".", "");
+				
+				//Strip away special characters.
+				s = s.replaceAll("[^a-zA-Z0-9 ]+","");
+				//s = s.replace("!", "");
+				//s = s.replace("?", "");
+				//s = s.replace("[", "");
+				//s = s.replace("]", "");
+				//s = s.replace("!", "");
 				
 				System.out.println(s);
 		    
@@ -343,7 +405,13 @@ public class FileManager
     
     void results(int PostNum, float PostWordCount, float AbuseCount, float SuspectCount)
     {
+    	//Calculate % of abusive content.
 		float results = (AbuseCount * 200 / PostWordCount );
+		if (results > 100)
+		{
+			results = 100;
+		}
+		
 		//Used to display numbers to 2 decimal places.
 		DecimalFormat df = new DecimalFormat("#.00");
     	if (Screen.simplecheck == false && Screen.childcheck == false)
@@ -389,6 +457,7 @@ public class FileManager
     			Screen.jta.append("A lot of abusive content has been found. This post \n is very abusive!\n\n");
     		}
     	}
+    	
     	
     	//Child option.
     	else if (Screen.childcheck == true)

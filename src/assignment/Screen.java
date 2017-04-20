@@ -26,6 +26,7 @@ public class Screen extends JFrame implements ActionListener
 	
    JButton button1;
    JButton button2;
+   JButton button8;
   
    //Verify Suspicious
    JButton button3;
@@ -33,7 +34,6 @@ public class Screen extends JFrame implements ActionListener
    //Verify Options
    JButton button4;
    JButton button5;
-   JButton button6;
    
    //Edit Post
    JButton button7;
@@ -67,7 +67,7 @@ public class Screen extends JFrame implements ActionListener
    Screen(String title)
    {
 	   int xsize = 800;
-	   int ysize = 800;
+	   int ysize = 500;
 	   JFrame window = new JFrame("Language Filter");
 	   window.setSize(xsize,ysize);
 	   window.setResizable(false);
@@ -77,22 +77,7 @@ public class Screen extends JFrame implements ActionListener
 	   panel.setLayout(null);
 	   window.add(panel);
 	   
-
-	   //Abuse detector. 
 	   
-	   label1 = new JLabel("Welcome to the abuse detector!");
-	   label1.setBounds(110,0,200,25);
-	   panel.add(label1);
-	   
-	   /*
-	   label2 = new JLabel();
-	   label2.setBounds(450,100,500,25);
-	   panel.add(label2);
-	   
-	   textfield1 = new JTextField (10);
-	   textfield1.setBounds(450,20,200,25);
-	   panel.add(textfield1);
-	   */
 	   
 	   //Verifying Suspicious Words.
 	   button1 = new JButton("Verify Suspicious Words");
@@ -101,24 +86,19 @@ public class Screen extends JFrame implements ActionListener
 	   button1.addActionListener(this);
 	   
 	   button4 = new JButton("Abusive");
-	   button4.setBounds(450,150,89,25);
+	   button4.setBounds(450,150,130,25);
 	   panel.add(button4);
 	   button4.addActionListener(this);
 	   
 	   button5 = new JButton("Safe");
-	   button5.setBounds(550,150,89,25);
+	   button5.setBounds(609,150,130,25);
 	   panel.add(button5);
 	   button5.addActionListener(this);
 	   
-	   button6 = new JButton("Ignore");
-	   button6.setBounds(650,150,89,25);
-	   panel.add(button6);
-	   button6.addActionListener(this);
 	   
 	   button1.setEnabled(false);
 	   button4.setEnabled(false);
 	   button5.setEnabled(false);
-	   button6.setEnabled(false);
 	   
 	   jta2 = new JTextArea();
 	   JScrollPane scroll2 = new JScrollPane (jta2);
@@ -129,21 +109,26 @@ public class Screen extends JFrame implements ActionListener
 	   panel.setVisible (true);
 	   
 	   //Adding new bad words
-	   label3 = new JLabel("Add new bad word!");
-	   label3.setBounds(150,600,400,25);
+	   label3 = new JLabel("Add or Remove Abusive Words");
+	   label3.setBounds(470,250,200,25);
 	   panel.add(label3);
 	   
 	   textfield2 = new JTextField (10);
-	   textfield2.setBounds(150,625,150,25);
+	   textfield2.setBounds(450,275,195,50);
 	   panel.add(textfield2);
 	   
-	   button2 = new JButton("Insert Word!");
-	   button2.setBounds(150,650,150,25);
+	   button2 = new JButton("Add");
+	   button2.setBounds(650,275,89,20);
 	   panel.add(button2);
 	   button2.addActionListener(this);
 	   
-	   label4 = new JLabel();
-	   label4.setBounds(150,675,500,25);
+	   button8 = new JButton("Remove");
+	   button8.setBounds(650,304,89,20);
+	   panel.add(button8);
+	   button8.addActionListener(this);
+	   
+	   label4 = new JLabel("");
+	   label4.setBounds(460,320,400,25);
 	   panel.add(label4);
 	   
 	   //Scan social media posts.
@@ -236,8 +221,7 @@ public class Screen extends JFrame implements ActionListener
 			   }
 			   else if (Verify >= FileManager.Evaluate)
 			   {
-				   Screen.jta2.setText("Verification complete!\nPlease rescan posts!");
-				   FileManager.Evaluate = 0;
+				   	VerifyComplete();
 			   }
 
 			   else
@@ -264,8 +248,7 @@ public class Screen extends JFrame implements ActionListener
 				   		f1.readFile();
 				   		if (Verify == FileManager.Evaluate)
 				   		{
-				   			Screen.jta2.setText("Verification complete!\nPlease rescan posts!");
-							   FileManager.Evaluate = 0;
+				   			VerifyComplete();
 				   		}
 				   }
 			   }
@@ -281,8 +264,7 @@ public class Screen extends JFrame implements ActionListener
 			   }
 			   else if (Verify >= FileManager.Evaluate)
 			   {
-				   Screen.jta2.setText("Verification complete!\nPlease rescan posts!");
-				   FileManager.Evaluate = 0;
+				   VerifyComplete();
 			   }
 
 			   else
@@ -311,36 +293,9 @@ public class Screen extends JFrame implements ActionListener
 				   		f2.readFile2();
 				   		if (Verify == FileManager.Evaluate)
 				   		{
-				   			Screen.jta2.setText("Verification complete!\nPlease rescan posts!");
-							   FileManager.Evaluate = 0;
+				   			VerifyComplete();
 				   		}
 				   }
-			   }
-		   }
-		   
-		   //Users that are unsure if a word is safe or abusive can skip it.
-		   if(action.getSource() == button6)
-		   {
-			   if (SuspectButtons == false)
-			   {
-				   Screen.jta2.setText("Please select verify button above.");
-				   return;
-			   }
-			   else if (Verify >= FileManager.Evaluate)
-			   {
-				   Screen.jta2.setText("Verification complete!\nPlease rescan posts!");
-				   FileManager.Evaluate = 0;
-			   }
-			   else
-			   {
-				   
-			   Verify++;
-			   Screen.jta2.append(FileManager.SuspectWordsEvaluate[Verify]);
-		   		if (Verify == FileManager.Evaluate)
-		   		{
-		   			Screen.jta2.setText("Verification complete!\nPlease rescan posts!");
-					FileManager.Evaluate = 0;
-		   		}
 			   }
 		   }
 		   
@@ -352,6 +307,13 @@ public class Screen extends JFrame implements ActionListener
 		   
 		   String input = textfield2.getText();
 		   
+		   //Ensures correct user input.
+		   while(!input.matches("[a-zA-Z]+"))
+		   {
+			   	Screen.label4.setText("Invalid syntax. Only characters are permitted.");
+			   	return;
+		   }
+		   
 		   FileManager f1 = new FileManager("abuse.txt");
 		   f1.connectToFile();
 		   f1.readFile();
@@ -361,13 +323,25 @@ public class Screen extends JFrame implements ActionListener
 		   } 
 		   catch (IOException e) 
 		   {
-			e.printStackTrace();
+			   e.printStackTrace();
 		   }
+		   finally
+		   {
+			   if (FileManager.insertion == true)
+			   {
+       				Screen.label4.setText("Word inserted!");
+       				FileManager.insertion = false;
+			   }
+		   }
+		   
+		   //Refreshes "BadWords" array.
+		   f1.readFile();
 	   }
 	   
 	   //Scan posts in "posts.txt" for abusive content.
 	   if(action.getSource() == button3)
 	   {
+
 		   Screen.jta2.setText(""); //Clear verify
 		   FileManager f1 = new FileManager("posts.txt");
 		   
@@ -378,7 +352,7 @@ public class Screen extends JFrame implements ActionListener
 		   f2.closeReadFile();
 		   
 		   FileManager.Evaluate = 0;
-		   	
+		   //Clears text.
 		   Screen.jta.setText(""); //Clears text.
 		   f1.connectToFile();
 		   f1.scanPost();
@@ -399,19 +373,73 @@ public class Screen extends JFrame implements ActionListener
 		   }
 	   }
 	   
+	   //Remove Bad Word
+	   if(action.getSource() == button8)
+	   {
+		   System.out.println("Insert word!");
+		   
+		   String input = textfield2.getText();
+		   
+		   //Ensures correct user input.
+		   while(!input.matches("[a-zA-Z]+"))
+		   {
+			   	Screen.label4.setText("Invalid syntax. Only characters are permitted.");
+			   	return;
+		   }
+		   
+		   FileManager f1 = new FileManager("abuse.txt");
+		   f1.connectToFile();
+		   f1.readFile();
+		   f1.getFileWriter();
+		   //f1.writeLineToFile("What"); //Clears the text file
+				   try
+				   {
+					   f1.AbuseRemove(input);
+				   }
+				   catch (IOException e) 
+				   {
+					   e.printStackTrace();
+				   }
+				   finally
+				   {
+					   f1.closeWriteFile();
+					   //Refreshes "BadWords" array.
+					   f1.readFile();
+					   if (FileManager.insertion == false)
+					   {
+						   Screen.label4.setText("Word does not exist!");
+					   }
+					   else
+					   {
+						   Screen.label4.setText("Word removed!");
+						   FileManager.insertion = false;
+					   }
+			   }
+		  
+	   }
+	   
 	   if (FileManager.Evaluate > 0)
 	   {
+		   //Enables verification buttons.
 		   button1.setEnabled(true);
 		   button4.setEnabled(true);
 		   button5.setEnabled(true);
-		   button6.setEnabled(true);
+		   
+		   //Disables adding bad words.
+		   button2.setEnabled(false);
+		   button8.setEnabled(false);
+		   Screen.label4.setText("");
 	   }
 	   else
 	   {
+		   //Disables verification buttons.
 		   button1.setEnabled(false);
 		   button4.setEnabled(false);
 		   button5.setEnabled(false);
-		   button6.setEnabled(false);
+		   
+		   //Enables adding and removing bad words.
+		   button2.setEnabled(true);
+		   button8.setEnabled(true);
 	   }
 	   
 	   //Scan posts in "posts.txt" for abusive content.
@@ -443,7 +471,14 @@ public class Screen extends JFrame implements ActionListener
 			   childcheck = false;
 		   }
 		   Screen.jta.setText("");
-	   }
-   }
-   		
+	   	}
+   	}
+
+
+   	void VerifyComplete()
+   	{
+   			Screen.jta2.setText("Verification complete!\nPlease rescan posts!");
+   			FileManager.Evaluate = 0;
+ 		   button2.setEnabled(true); //Bad Word option is enabled.
+   	}
 }
