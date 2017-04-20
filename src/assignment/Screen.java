@@ -1,28 +1,22 @@
 package assignment;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
-import javax.swing.JRadioButton;
 import javax.swing.*;
 import java.io.*;
-import java.util.Arrays;
-import java.util.regex.Pattern;
 import javax.swing.JCheckBox;
 
 import assignment.FileManager;
 
+@SuppressWarnings("serial")
 public class Screen extends JFrame implements ActionListener
 {
-//Buttons
+	//Buttons
 	JButton button1;
 	JButton button2;
 	JButton button3;
@@ -50,7 +44,7 @@ public class Screen extends JFrame implements ActionListener
 	JCheckBox simple;
 	JCheckBox child;
    
-	//TextAreas with Scroller.
+	//TextAreas with Scroll Panes.
 	static JTextArea jta;
 	static JTextArea jta2;
 	static JScrollPane jsp;
@@ -67,7 +61,7 @@ public class Screen extends JFrame implements ActionListener
 		//Frame settings.
 		int xsize = 800;
 	   	int ysize = 500;
-	   	JFrame window = new JFrame("Language Filter");
+	   	JFrame window = new JFrame("Abusive Text Detector");
 	   	window.setSize(xsize,ysize);
 	   	window.setResizable(false);
 	   	window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -83,8 +77,8 @@ public class Screen extends JFrame implements ActionListener
 	   	panel.add(button1);
 	   	button1.addActionListener(this);
 	   
-	   	button2 = new JButton("Add"); //Abuse
-	   	button2.setBounds(650,245,89,20);
+	   	button2 = new JButton("Add"); //Add Abuse
+	   	button2.setBounds(650,270,89,20);
 	   	panel.add(button2);
 	   	button2.addActionListener(this);
 	   
@@ -103,8 +97,8 @@ public class Screen extends JFrame implements ActionListener
 	  	panel.add(button5);
 	  	button5.addActionListener(this);
 	   
-	  	button8 = new JButton("Remove"); //Abuse
-	  	button8.setBounds(650,274,89,20);
+	  	button8 = new JButton("Remove"); //Remove Abuse
+	  	button8.setBounds(650,299,89,20);
 	  	panel.add(button8);
 	  	button8.addActionListener(this);
 	   
@@ -113,13 +107,13 @@ public class Screen extends JFrame implements ActionListener
 	  	panel.add(button7);
 	  	button7.addActionListener(this);
 	   
-	  	button9 = new JButton("Add"); //Safe
-	  	button9.setBounds(650,345,89,20);
+	  	button9 = new JButton("Add"); //Add Safe
+	  	button9.setBounds(650,370,89,20);
 	  	panel.add(button9);
 	  	button9.addActionListener(this);
 	   
-	  	button10 = new JButton("Remove"); //Safe
-	  	button10.setBounds(650,374,89,20);
+	  	button10 = new JButton("Remove"); //Remove Safe
+	  	button10.setBounds(650,399,89,20);
 	  	panel.add(button10);
 	  	button10.addActionListener(this);
 
@@ -129,30 +123,30 @@ public class Screen extends JFrame implements ActionListener
 	   
 	  	
 	  	//Labels.
-	  	label3 = new JLabel("Bad Word (Add or Remove)"); // Adding / Removing new safe words.
-	  	label3.setBounds(470,220,200,25);
+	  	label3 = new JLabel("Bad Word (Add or Remove)"); // Adding & Removing new safe words.
+	  	label3.setBounds(470,245,200,25);
 	  	panel.add(label3);
 	   
-	  	label4 = new JLabel(""); //Results of adding/removing bad words.
-	  	label4.setBounds(460,290,400,25);
+	  	label4 = new JLabel(""); //Results of Adding & Removing bad words.
+	  	label4.setBounds(460,315,400,25);
 	  	panel.add(label4);
 	   
-	  	label5 = new JLabel(""); //Results of adding/removing safe words.
-	  	label5.setBounds(460,390,400,25);
+	  	label5 = new JLabel(""); //Results of Adding & Removing safe words.
+	  	label5.setBounds(460,415,400,25);
 	  	panel.add(label5);
 	   
-	  	label6 = new JLabel("Safe Word (Add or Remove)"); // Adding / Removing new bad words.
-	  	label6.setBounds(470,320,200,25);
+	  	label6 = new JLabel("Safe Word (Add or Remove)"); // Adding & Removing new bad words.
+	  	label6.setBounds(470,345,200,25);
 	  	panel.add(label6);
 	   
 	  	
 	  	//Text Fields
 	  	textfield2 = new JTextField (10); //Bad Word Text Box
-	  	textfield2.setBounds(450,245,195,50);
+	  	textfield2.setBounds(450,270,195,50);
 	  	panel.add(textfield2);
 
 	  	textfield4 = new JTextField (10); //Safe Word Text Box
-	  	textfield4.setBounds(450,345,195,50);
+	  	textfield4.setBounds(450,370,195,50);
 	  	panel.add(textfield4);
 	   
 	   
@@ -178,13 +172,71 @@ public class Screen extends JFrame implements ActionListener
 	  	panel.add(simple);
 	  	simple.addActionListener(this);
 	   
-	  	child = new JCheckBox("Child"); 	   //Child filter results.
+	  	child = new JCheckBox("Child");  //Child filter results.
 	  	child.setBounds(290,40,70,25);
 	  	panel.add(child);
 	  	child.addActionListener(this);
 	   
-	  	//Making it visible now ensures all GUI components load.
+	  	//Make window visible now ensures all GUI components load.
 	  	window.setVisible(true);
+	   	
+	   	//If the necessary text files don't exist, create them.
+	   	//"abuse.txt"
+	   	try 
+	   	{
+			new FileOutputStream("abuse.txt", true).close();
+		} 
+	   	catch (FileNotFoundException e) 
+	   	{
+			e.printStackTrace();
+		} 
+	   	catch (IOException e) 
+	   	{
+			e.printStackTrace();
+		}
+	   	
+	   	//"safe.txt"
+	   	try 
+	   	{
+			new FileOutputStream("posts.txt", true).close();
+		} 
+	   	catch (FileNotFoundException e) 
+	   	{
+			e.printStackTrace();
+		} 
+	   	catch (IOException e) 
+	   	{
+			e.printStackTrace();
+		}
+	   	
+	   	//"suspect.txt"
+	   	try 
+	   	{
+			new FileOutputStream("suspect.txt", true).close();
+		} 
+	   	catch (FileNotFoundException e) 
+	   	{
+			e.printStackTrace();
+		} 
+	   	catch (IOException e) 
+	   	{
+			e.printStackTrace();
+		}
+	   	
+	   	//"posts.txt"
+	   	try 
+	   	{
+			new FileOutputStream("safe.txt", true).close();
+		} 
+	   	catch (FileNotFoundException e) 
+	   	{
+			e.printStackTrace();
+		} 
+	   	catch (IOException e) 
+	   	{
+			e.printStackTrace();
+		}
+	   	
 	   
 	   	//Open and close file.
 	   	FileManager f1 = new FileManager("abuse.txt");
@@ -193,27 +245,39 @@ public class Screen extends JFrame implements ActionListener
 	   	f1.readFile();
 	   	f2.connectToFile();
 	   	f2.readFile2();
+	   	
 	}
    
-  	boolean SuspectButtons = false; //Users can't mark suspicious words while this is false.
 	//Event Handler
    	public void actionPerformed(ActionEvent action)
    	{
+
    		//Text Files.
 		FileManager f1 = new FileManager("abuse.txt");
 		FileManager f2 = new FileManager("posts.txt");
    		FileManager f3 = new FileManager("suspect.txt");
    		FileManager f4 = new FileManager("safe.txt");
+   		
+		//Refreshes "Bad Words"
+		f1.connectToFile();
+		f1.readFile();
+		f1.closeReadFile();
+		
+		//Refreshes "Safe Words"
+		f4.connectToFile();
+		f4.readFile2();
+		f4.closeReadFile();
    			
    	   	//Button 1 (Verify Suspicious Words)
    		if(action.getSource() == button1)
    		{
+			button4.setEnabled(true);
+			button5.setEnabled(true);
    			button1.setEnabled(false); //Disable button while user is verifying.
    			while (FileManager.SuspectWordsEvaluate[Verify] == "")
 			{
    				Verify++;
 			}
-   			SuspectButtons = true; //Enable verification.
    			f3.connectToFile(); //Connect to "suspect.txt".
    			f3.getFileWriter();
    			for(int i = 0; i!= FileManager.Evaluate; i++)
@@ -235,9 +299,9 @@ public class Screen extends JFrame implements ActionListener
    			{
    				Screen.label4.setText("Invalid syntax. Only characters are permitted.");
    				return;
-  				}
+  			}
   				
-  				//Refreshes "Bad Words"
+  			//Refreshes "Bad Words"
    			f1.connectToFile();
    			f1.readFile();
    			
@@ -284,22 +348,24 @@ public class Screen extends JFrame implements ActionListener
    		   	f2.connectToFile();
    		   	f2.scanPost();
    		   	f2.closeReadFile();
+   		   	
+   			if (FileManager.Evaluate > 0)
+   			{
+   				//Enables verification button & disables "abuse" & "safe" buttons.
+   				button1.setEnabled(true);
+   				button4.setEnabled(false);
+   				button5.setEnabled(false);
+   			}
    	   	}
 		   
-   		
    			
    			
    		//Button 4 (User verifies the suspicious word as "Abusive")
    		if(action.getSource() == button4)
    		{
    			
-   			if (SuspectButtons == false)
-   			{
-			   Screen.jta2.setText("Please select verify button above.");
-			   return;
-   			}
    			
-   			else if (Verify >= FileManager.Evaluate)
+   			if (Verify >= FileManager.Evaluate)
    			{
    				VerifyComplete();
    			}
@@ -336,17 +402,12 @@ public class Screen extends JFrame implements ActionListener
 		   
    			
    			
-		//Button 5( User marks the word as "Safe")
+   		//Button 5 (User marks the word as "Safe")
    		if(action.getSource() == button5)
 		{
-		   	if (SuspectButtons == false)
-		   	{
-			   	Screen.jta2.setText("Please select verify button above.");
-			   	return;
-			}
 			   
 			//End verification.
-			else if (Verify >= FileManager.Evaluate)
+			if (Verify >= FileManager.Evaluate)
 			{
 				VerifyComplete();
 			}
@@ -356,6 +417,7 @@ public class Screen extends JFrame implements ActionListener
 				//Refresh "SafeWords".
 				f4.connectToFile();
 				f4.readFile2();
+				f4.closeReadFile();
 					  
 				try 
 			   	{
@@ -370,8 +432,8 @@ public class Screen extends JFrame implements ActionListener
 			   	finally
 			   	{
 			   		Verify++;
-				   	Screen.jta2.append(FileManager.SuspectWordsEvaluate[Verify]);
 				   	Screen.jta2.setText(""); //Clear text box.
+				   	Screen.jta2.append(FileManager.SuspectWordsEvaluate[Verify]);
 				   	
 				    //Refresh SafeWords.
 			 		f4.readFile2();
@@ -384,7 +446,6 @@ public class Screen extends JFrame implements ActionListener
 			   	}
 			}
 		}
-		   
 	  
 	   
    		//Button 7 (Edit posts)
@@ -402,7 +463,7 @@ public class Screen extends JFrame implements ActionListener
    		}
 	   
 		   
-	//Button 8 (Remove Bad Word)
+   		//Button 8 (Remove Bad Word)
    		if(action.getSource() == button8)
    		{
    			String input = textfield2.getText();
@@ -530,12 +591,9 @@ public class Screen extends JFrame implements ActionListener
    		}
 	   
 	   
+   		//If suspicious words exist.
 		if (FileManager.Evaluate > 0)
 		{
-			//Enables verification buttons.
-			button1.setEnabled(true);
-			button4.setEnabled(true);
-			button5.setEnabled(true);
 		   
 			//Disables adding/removing of bad/safe words.
 			button2.setEnabled(false);
@@ -588,13 +646,14 @@ public class Screen extends JFrame implements ActionListener
 				childcheck = false;
 			}
 				Screen.jta.setText("");
-			}
-   		}
+		}
+   	}
 
-   		void VerifyComplete()
-   		{
-   				Screen.jta2.setText("Verification complete!\nPlease rescan posts!");
-   				FileManager.Evaluate = 0;
-   				button2.setEnabled(true); //Bad Word option is enabled.
-   		}
-	}
+   	void VerifyComplete()
+   	{
+   		Screen.jta2.setText("Verification complete!\nPlease rescan posts!");
+   		FileManager.Evaluate = 0;
+   		Verify = 0;
+   		button2.setEnabled(true); //Bad Word option is enabled.
+   	}
+}

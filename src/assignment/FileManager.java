@@ -1,41 +1,35 @@
 package assignment;
 
-import java.awt.Font;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Scanner;
-
-import com.sun.org.apache.xpath.internal.operations.Equals;
-import com.sun.prism.paint.Color;
-
 import java.io.IOException;
-import java.util.Arrays;
 
 public class FileManager 
 {
 	String fileName;
 	File fileExample;
 	Scanner myScanner;
-	//Scanner duplicate;
     PrintWriter pwInput;
     
     //Variables for "Screen.java"
     public static boolean insertion = false;
     
 	public static String[] BadWords = new String[25000]; //Puts all bad words into an array.
+	public static String[] DisplayBadWords = new String[25000]; //Puts detected bad words to show user later.
 	public static String[] SafeWords = new String[25000]; //Safe words that are ignored by scanner.
 	public static String[] SuspectWords = new String [25000]; //Suspicious words are put in here and scanned again.
 	public static String[] SuspectWordsEvaluate = new String [25000]; //Suspicious words that will later be evaluated by the user.
 	public static int Evaluate = 0; //Tracks suspicious that need evaluation.
-	int Duplicate = 0; //Duplicate suspicious words.
 	public static String[] PostScan = new String[250];
 	public static String[] PostWord = new String[250];
 	public static int BadWordCount = 0; //Counts number of bad words in "abuse.txt"
 	public static int SafeWordCount = 0; //Counts number of safe words in "safe.txt"
+	int Duplicate = 0; //Duplicate suspicious words.
+	int DisplayBad = 0; //Used to put words into displayed bad words.
 	
 	// Constructor
 	FileManager (String fileName)
@@ -90,7 +84,8 @@ public class FileManager
 		}
 		catch (FileNotFoundException e)
 		{
-			System.out.println("Rune Time Error " + e.getMessage());
+			System.out.println("Run Time Error " + e.getMessage());
+			
 		}
     }
     
@@ -158,7 +153,8 @@ public class FileManager
     {
     	FileWriter fileWriter = null;
 		File file = new File("safe.txt");
-    	
+		
+		
 		for(int j = 0 ; j != SafeWordCount; j++)
     	{
     		if (!input.toLowerCase().equals(SafeWords[j].toLowerCase()))
@@ -208,6 +204,15 @@ public class FileManager
     	FileWriter fileWriter = null;
     	boolean allowinsert = false;
     	
+		//Check that safe word is not in "abuse.txt".
+		for(int j = 0 ; j != SafeWordCount; j++)
+    	{
+    		if (input.toLowerCase().equals(SafeWords[j].toLowerCase()))
+    		{
+    			Screen.label4.setText("Word exists as a safe word!");
+    			return;
+    		}
+    	}
     	
     	for(int j = 0 ; j != BadWordCount; j++)
     	{
@@ -231,7 +236,7 @@ public class FileManager
         	
     		catch (FileNotFoundException e)
     		{
-    			System.out.println("run time error " + e.getMessage());
+    			System.out.println("Run time error " + e.getMessage());
     		}
         	
         	finally
@@ -249,19 +254,29 @@ public class FileManager
     void SafeAppend2(String input) throws IOException
     {
     	FileWriter fileWriter = null;
-    	boolean insert = false;
+    	boolean allowinsert = false;
+    	
+		//Check that safe word is not in "abuse.txt".
+		for(int j = 0 ; j != BadWordCount; j++)
+    	{
+    		if (input.toLowerCase().equals(BadWords[j].toLowerCase()))
+    		{
+    			Screen.label5.setText("Word exists as a bad word!");
+    			return;
+    		}
+    	}
     	
     	
     	for(int j = 0 ; j != SafeWordCount; j++)
     	{
     		if (input.toLowerCase().equals(SafeWords[j].toLowerCase()))
     		{
-	    		insert = true;
+	    		allowinsert = true;
 	    		Screen.label5.setText("Word already exists!");
     		}
     	}
     	
-    	if (insert == false)
+    	if (allowinsert == false)
     	{
         	try
         	{
@@ -302,7 +317,7 @@ public class FileManager
 	    	myScanner = new Scanner(fileExample); 
 			while (myScanner.hasNextLine())
 			 {
-				
+				//Put each line into "PostScan"
 				PostScan[i]  = myScanner.nextLine();
 				
 				//ArrayString into a string.
@@ -314,7 +329,7 @@ public class FileManager
 				//Split string into words.
 				String[] words = s.split(" ");
 				
-				for ( String ss : words) 
+				for ( @SuppressWarnings("unused") String ss : words) 
 				{
 					PostWordCount++;
 				}
@@ -345,9 +360,10 @@ public class FileManager
 						//If word fully matches bad word in "abuse.txt"
 						if(ss.toLowerCase().equals(BadWords[j].toLowerCase()))
 				    	{
-				    		   AbuseCount++;
-				    		   j = BadWordCount;
-				    		   break;
+							AbuseCount++;
+							DisplayBadWords[DisplayBad] = ss;
+							DisplayBad++;
+							break;
 				    	}
 						
 						//If elements of bad word in "abuse.txt" are in a word (suspicious words).
@@ -363,10 +379,6 @@ public class FileManager
 									Duplicate++;
 									break;
 								}
-								else
-								{
-									
-								}
 							}
 							
 							SuspectWords[bad] = ss;
@@ -379,14 +391,12 @@ public class FileManager
 							{
 								if (ss.toLowerCase().equals(BadWords[l].toLowerCase()))
 								{
-									System.out.println(ss);
 									SuspectCount--;
 									Evaluate--;
 									bad--;
 									l = BadWordCount;
 									SuspectWords[bad] = "";
 									SuspectWordsEvaluate[Evaluate] = "";
-									System.out.println(Evaluate);
 								}
 							}
 				    	}
@@ -394,7 +404,6 @@ public class FileManager
 				}
 
 				//When blank line is detected.
-				float percentage;
 				if(PostScan[i].isEmpty())
 				{
 					PostWordCount -= 1;
@@ -420,25 +429,20 @@ public class FileManager
 						SuspectCount = 0;
 					}
 				}			
-			 }			
+			}			
 		}
 	    
 		catch (FileNotFoundException e)
 		{
 			System.out.println("run time error " + e.getMessage());
 		}
-	    
-	    finally
-	    {
-	    	//Do nothing
-	    }
     }
     
     //Display results of the previous scan.
     void results(int PostNum, float PostWordCount, float AbuseCount, float SuspectCount)
     {
     	//Calculate % of abusive content.
-		float results = (AbuseCount * 200 / PostWordCount );
+		float results = (AbuseCount * 175 / PostWordCount );
 		if (results > 100)
 		{
 			results = 100;
@@ -450,8 +454,20 @@ public class FileManager
     	if (Screen.simplecheck == false && Screen.childcheck == false)
     	{
     		
-    		Screen.jta.append("Post " + PostNum + ":\n" + (int)PostWordCount + " words + " + (int)AbuseCount + " abusive words + " + (int)SuspectCount + " suspicious words \n");
-
+    		Screen.jta.append("Post " + PostNum + ":\nWords: " + (int)PostWordCount + " (Abusive: " + (int)AbuseCount + ") (Suspicious: " + (int)SuspectCount + ")\n");
+    		
+    		if (DisplayBad != 0)
+    		{
+        		Screen.jta.append("Abusive Words in this Post:\n");
+        		for (int j = 0; j != DisplayBad; j++)
+        		{
+            		Screen.jta.append("- - - " + DisplayBadWords[j] + "\n");
+        		}
+        		
+        		Screen.jta.append("");
+				DisplayBad = 0;
+    		}
+    		
     		//Display results.
     		if(results == 0)
     		{
@@ -464,27 +480,27 @@ public class FileManager
     		//Tell user if post is abusive.
     		if (results == 0)
     		{
-    			Screen.jta.append("No abuse detected, this sentence is not abusive!\n\n");
+    			Screen.jta.append("No abuse detected. This sentence is not abusive!\n\n");
     		}
     		else if (results < 7.5)
     		{
-    			Screen.jta.append("Traces amount of abusive words detected. This post\nis probably not abusive!\n\n");
+    			Screen.jta.append("Tiny amounts of abusive words detected. This post\nis probably not abusive!\n\n");
     		}
     		else if (results < 15.0)
     		{
-    			Screen.jta.append("Small of abusive content have been found. This post \nhas a low chance of being abusive!\n\n");
+    			Screen.jta.append("Small amount of abusive content have been detected. This post \nhas a low chance of being abusive!\n\n");
     		}
-    		else if (results < 25.0)
+    		else if (results < 30.0)
     		{
-    			Screen.jta.append("Abusive content has been found. This post \n is probably abusive!\n\n");
+    			Screen.jta.append("Medium amount of abusive content has been detected. This post \nis probably abusive!\n\n");
     		}
     		else if (results < 50)
     		{
-    			Screen.jta.append("Much abusive content has been found. This post \n is abusive!\n\n");
+    			Screen.jta.append("High amount of abusive content has been detected. This post \nis abusive!\n\n");
     		}
     		else
     		{
-    			Screen.jta.append("A lot of abusive content has been found. This post \n is very abusive!\n\n");
+    			Screen.jta.append("Extremely high amount of abusive content has been detected.\nThis post is very abusive!\n\n");
     		}
     	}
     	
@@ -517,23 +533,23 @@ public class FileManager
     		}
     		else if (results < 7.5)
     		{
-    			Screen.jta.append("Traces of abuse.");
+    			Screen.jta.append("Tiny amount of abuse.");
     		}
     		else if (results < 15.0)
     		{
     			Screen.jta.append("Small amount of abuse.");
     		}
-    		else if (results < 25.0)
+    		else if (results < 30.0)
     		{
-    			Screen.jta.append("Probably abusive.");
+    			Screen.jta.append("Medium amount of abuse.");
     		}
     		else if (results < 50)
     		{
-    			Screen.jta.append("Abusive.");
+    			Screen.jta.append("High amount of abuse.");
     		}
     		else
     		{
-    			Screen.jta.append("Very Aabusive");
+    			Screen.jta.append("Extremely high amount of abuse.");
     		}
     		if (results == 0)
     		{
@@ -544,7 +560,7 @@ public class FileManager
         		Screen.jta.append(" (" + (df.format(results)) + "% abusive)" + "\n");	
     		}
     	}
-    	
+    	Screen.jta.append("///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n\n");
     	//If suspicious words exist, prompt user to verify them.
     	if (Evaluate > 0)
     	{
