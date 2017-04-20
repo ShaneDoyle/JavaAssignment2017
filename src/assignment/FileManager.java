@@ -20,7 +20,7 @@ public class FileManager
 	String fileName;
 	File fileExample;
 	Scanner myScanner;
-	Scanner duplicate;
+	//Scanner duplicate;
     PrintWriter pwInput;
     
     //Variables for "Screen.java"
@@ -49,7 +49,7 @@ public class FileManager
 		fileExample = new File(fileName);
 	}
 
-	// Read the file, returning a string of lines
+	//Read the "abuse.txt" file, returning a string of lines
     void readFile()
     {
     	fileExample = new File(fileName);
@@ -60,19 +60,19 @@ public class FileManager
 	    	myScanner = new Scanner(fileExample); 
 			while (myScanner.hasNext())
 			 {
-					BadWords[j]  = myScanner.next();
-					BadWordCount++;
-			     //System.out.println(BadWords[j]);
-			     j++;
+				BadWords[j]  = myScanner.next();
+				BadWordCount++;
+				j++;
 			 }
-			System.out.println("Bad Word Count: " + BadWordCount);
 		}
+	    
 		catch (FileNotFoundException e)
 		{
 			System.out.println("run time error " + e.getMessage());
 		}
     }
     
+	//Read the "safe.txt" file, returning a string of lines
     void readFile2()
     {
     	fileExample = new File(fileName);
@@ -81,18 +81,16 @@ public class FileManager
 	    try
 		{
 	    	myScanner = new Scanner(fileExample); 
-			while (myScanner.hasNextLine())
+			while (myScanner.hasNext())
 			 {
-				 SafeWords[j]  = myScanner.nextLine();
+				 SafeWords[j]  = myScanner.next();
 				 SafeWordCount++;
-			     //System.out.println(SafeWords[j]);
 			     j++;
 			 }
-			System.out.println("Safe Word Count: " + SafeWordCount);
 		}
 		catch (FileNotFoundException e)
 		{
-			System.out.println("run time error " + e.getMessage());
+			System.out.println("Rune Time Error " + e.getMessage());
 		}
     }
     
@@ -110,7 +108,7 @@ public class FileManager
     	
     }	
 
-	//Write a string to the file
+	//Write a string to the file.
     void writeLineToFile(String line)
     {
        System.out.println(line);
@@ -139,6 +137,44 @@ public class FileManager
             	
         		catch (FileNotFoundException e)
         		{
+        			System.out.println("Run Time Error " + e.getMessage());
+        		}
+            	
+            	finally
+            	{
+            		fileWriter.close();
+            	}
+    		}
+    		else
+    		{
+        		insertion = true; //Removal was successful.
+    		}
+    	}
+    }	
+    
+    
+    //Recreate "safe.txt" for removing bad word.
+    void SafeRemove(String input) throws IOException
+    {
+    	FileWriter fileWriter = null;
+		File file = new File("safe.txt");
+    	
+		for(int j = 0 ; j != SafeWordCount; j++)
+    	{
+    		if (!input.toLowerCase().equals(SafeWords[j].toLowerCase()))
+    		{
+            	try
+            	{
+            		fileWriter = new FileWriter(file, true);
+            		fileWriter.write(SafeWords[j]);
+            		if(j != SafeWordCount-1)
+            		{
+                		fileWriter.write("\n");
+            		}
+            	}
+            	
+        		catch (FileNotFoundException e)
+        		{
         			System.out.println("run time error " + e.getMessage());
         		}
             	
@@ -149,13 +185,12 @@ public class FileManager
     		}
     		else
     		{
-        		insertion = true;
+        		insertion = true; //Removal was successful.
     		}
-
-    		
     	}
     	
     }	
+      
     
     void closeReadFile()
     {
@@ -167,25 +202,23 @@ public class FileManager
 		 pwInput.close();
     }
     
-    //Append text to a file.
+    //Append bad words to "abuse.txt"
     void AbuseAppend(String input) throws IOException
     {
     	FileWriter fileWriter = null;
-    	boolean insert = false;
-    	int lastline = 0;
+    	boolean allowinsert = false;
     	
     	
     	for(int j = 0 ; j != BadWordCount; j++)
     	{
     		if (input.toLowerCase().equals(BadWords[j].toLowerCase()))
     		{
+	    		allowinsert = true;
 	    		Screen.label4.setText("Word already exists!");
-	    		insert = true;
-	    		lastline = j;
     		}
     	}
     	
-    	if (insert == false)
+    	if (allowinsert == false)
     	{
         	try
         	{
@@ -193,7 +226,7 @@ public class FileManager
         		fileWriter = new FileWriter(file, true);
         		fileWriter.write("\n");
         		fileWriter.write(input);
-        		insertion = true;
+        		insertion = true; //Insertion was successful.
         	}
         	
     		catch (FileNotFoundException e)
@@ -205,47 +238,58 @@ public class FileManager
         	{
         		if (fileWriter != null)
         		{
-        			//Close filewriter.
         			fileWriter.close();
         		}
         	}
     	}
     }
+
     
-    //Append text to a file.
-    void SafeAppend(String input) throws IOException
+    //Append safe words to "safe.txt"
+    void SafeAppend2(String input) throws IOException
     {
     	FileWriter fileWriter = null;
+    	boolean insert = false;
     	
-	    //Inserts user's word.
-    	try
+    	
+    	for(int j = 0 ; j != SafeWordCount; j++)
     	{
-    		File file = new File("safe.txt");
-    		fileWriter = new FileWriter(file, true);
-    		fileWriter.write(input);
-    		fileWriter.write("\n");
-    	}
-    	
-		catch (FileNotFoundException e)
-		{
-			System.out.println("run time error " + e.getMessage());
-		}
-    	
-    	finally
-    	{
-    		if (fileWriter != null)
+    		if (input.toLowerCase().equals(SafeWords[j].toLowerCase()))
     		{
-    			fileWriter.close();
+	    		insert = true;
+	    		Screen.label5.setText("Word already exists!");
     		}
     	}
+    	
+    	if (insert == false)
+    	{
+        	try
+        	{
+        		File file = new File("safe.txt");
+        		fileWriter = new FileWriter(file, true);
+        		fileWriter.write("\n");
+        		fileWriter.write(input);
+        		insertion = true; //Insertion was successful.
+        	}
+        	
+    		catch (FileNotFoundException e)
+    		{
+    			System.out.println("run time error " + e.getMessage());
+    		}
+        	
+        	finally
+        	{
+        		if (fileWriter != null)
+        		{
+        			fileWriter.close();
+        		}
+        	}
+    	}
     }
-    
-    
-    
+
     //Scan Posts
     void scanPost()
     {
-    	boolean check = false; //Ensures a word doesn't get counted twice for suspicious and abusive.
     	int i = 0;
     	int bad = 0;
     	int PostNum = 0;
@@ -256,26 +300,17 @@ public class FileManager
 	    try
 		{
 	    	myScanner = new Scanner(fileExample); 
-	    	duplicate = new Scanner(fileExample); 
 			while (myScanner.hasNextLine())
 			 {
 				
 				PostScan[i]  = myScanner.nextLine();
-				//System.out.println(PostScan[i]);
 				
 				//ArrayString into a string.
 				String s = PostScan[i];
 				
 				//Strip away special characters.
 				s = s.replaceAll("[^a-zA-Z0-9 ]+","");
-				//s = s.replace("!", "");
-				//s = s.replace("?", "");
-				//s = s.replace("[", "");
-				//s = s.replace("]", "");
-				//s = s.replace("!", "");
-				
-				System.out.println(s);
-		    
+				    
 				//Split string into words.
 				String[] words = s.split(" ");
 				
@@ -312,7 +347,6 @@ public class FileManager
 				    	{
 				    		   AbuseCount++;
 				    		   j = BadWordCount;
-				    		   check = true;
 				    		   break;
 				    	}
 						
@@ -335,74 +369,72 @@ public class FileManager
 								}
 							}
 							
-					    		SuspectWords[bad] = ss;
-					    		SuspectWordsEvaluate[Evaluate] = ss;
-					    		Evaluate++;
-					    		bad++;
-					    		SuspectCount++;
-					    		System.out.println(Evaluate);
+							SuspectWords[bad] = ss;
+							SuspectWordsEvaluate[Evaluate] = ss;
+							Evaluate++;
+							bad++;
+							SuspectCount++;
 
-					    		for (int l = 0; l < BadWordCount; l++)
-					    		{
-					    			if (ss.toLowerCase().equals(BadWords[l].toLowerCase()))
-					    			{
-					    				System.out.println(ss);
-					    				SuspectCount--;
-					    				Evaluate--;
-					    				bad--;
-					    				l = BadWordCount;
-							    		SuspectWords[bad] = "";
-							    		SuspectWordsEvaluate[Evaluate] = "";
-							    		System.out.println(Evaluate);
-					    			}
-					    		}
-				    		}
-						}
+							for (int l = 0; l < BadWordCount; l++)
+							{
+								if (ss.toLowerCase().equals(BadWords[l].toLowerCase()))
+								{
+									System.out.println(ss);
+									SuspectCount--;
+									Evaluate--;
+									bad--;
+									l = BadWordCount;
+									SuspectWords[bad] = "";
+									SuspectWordsEvaluate[Evaluate] = "";
+									System.out.println(Evaluate);
+								}
+							}
+				    	}
 					}
-				
-				
-			
-								
-				
-					//When blank line is detected.
-					float percentage;
-					if(PostScan[i].isEmpty())
+				}
+
+				//When blank line is detected.
+				float percentage;
+				if(PostScan[i].isEmpty())
+				{
+					PostWordCount -= 1;
+					if(PostWordCount != 0 )
 					{
-						PostWordCount -= 1;
-						if(PostWordCount != 0 )
-						{
-							PostNum++;
-							results(PostNum, PostWordCount, AbuseCount, SuspectCount);
-							PostWordCount = 0;
-							AbuseCount = 0;
-							SuspectCount = 0;
-						}
+						PostNum++;
+						results(PostNum, PostWordCount, AbuseCount, SuspectCount);
+						PostWordCount = 0;
+						AbuseCount = 0;
+						SuspectCount = 0;
 					}
+				}
 					
-					//If no next line is detected (EOF)
-					if(!myScanner.hasNextLine())
+				//If no next line is detected (EOF)
+				if(!myScanner.hasNextLine())
+				{
+					if(PostWordCount != 0 )
 					{
-						if(PostWordCount != 0 )
-						{
-							PostNum++;
-							results(PostNum, PostWordCount, AbuseCount, SuspectCount);
-							PostWordCount = 0;
-							AbuseCount = 0;
-							SuspectCount = 0;
-						}
-					}			
+						PostNum++;
+						results(PostNum, PostWordCount, AbuseCount, SuspectCount);
+						PostWordCount = 0;
+						AbuseCount = 0;
+						SuspectCount = 0;
+					}
+				}			
 			 }			
 		}
+	    
 		catch (FileNotFoundException e)
 		{
 			System.out.println("run time error " + e.getMessage());
 		}
+	    
 	    finally
 	    {
 	    	//Do nothing
 	    }
     }
     
+    //Display results of the previous scan.
     void results(int PostNum, float PostWordCount, float AbuseCount, float SuspectCount)
     {
     	//Calculate % of abusive content.
@@ -411,17 +443,16 @@ public class FileManager
 		{
 			results = 100;
 		}
-		
 		//Used to display numbers to 2 decimal places.
 		DecimalFormat df = new DecimalFormat("#.00");
+		
+		//Normal Scan.
     	if (Screen.simplecheck == false && Screen.childcheck == false)
     	{
     		
-    		System.out.println("Post:" + PostNum + " " + PostWordCount + " words & " + AbuseCount + " abusive words & " + SuspectCount + " suspicious words" );
     		Screen.jta.append("Post " + PostNum + ":\n" + (int)PostWordCount + " words + " + (int)AbuseCount + " abusive words + " + (int)SuspectCount + " suspicious words \n");
-    		
-    		
-    		//Display results percentages.
+
+    		//Display results.
     		if(results == 0)
     		{
     			Screen.jta.append("Results: 0% offensive.\n");
@@ -430,7 +461,6 @@ public class FileManager
     		{
     			Screen.jta.append("Results: " + (df.format(results)) + "% offensive.\n");
     		}
-    	
     		//Tell user if post is abusive.
     		if (results == 0)
     		{
@@ -442,7 +472,7 @@ public class FileManager
     		}
     		else if (results < 15.0)
     		{
-    			Screen.jta.append("Small of abusive content have been found. This post \n has a low chance of being abusive!\n\n");
+    			Screen.jta.append("Small of abusive content have been found. This post \nhas a low chance of being abusive!\n\n");
     		}
     		else if (results < 25.0)
     		{
@@ -459,9 +489,10 @@ public class FileManager
     	}
     	
     	
-    	//Child option.
+    	//Child filter option.
     	else if (Screen.childcheck == true)
     	{
+    		//Display results
     		Screen.jta.append("Post " + PostNum + ": ");
     		if (results != 0)
     		{
@@ -473,12 +504,13 @@ public class FileManager
     		}
     		Screen.jta.append("\n");
     	}
-    	
-    	
     	else
+    		
+    	//Simplify option.
     	{
+    		//Results
     		Screen.jta.append("Post " + PostNum + ": "); 
-    		//Tell user if post is abusive.
+    		
     		if (results == 0)
     		{
     			Screen.jta.append("No abuse.");
@@ -512,6 +544,7 @@ public class FileManager
         		Screen.jta.append(" (" + (df.format(results)) + "% abusive)" + "\n");	
     		}
     	}
+    	
     	//If suspicious words exist, prompt user to verify them.
     	if (Evaluate > 0)
     	{
