@@ -442,7 +442,7 @@ public class FileManager
     void results(int PostNum, float PostWordCount, float AbuseCount, float SuspectCount)
     {
     	//Calculate % of abusive content.
-		float results = (AbuseCount * 175 / PostWordCount );
+		float results = (AbuseCount * 150 / PostWordCount );
 		if (results > 100)
 		{
 			results = 100;

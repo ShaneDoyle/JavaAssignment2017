@@ -294,6 +294,7 @@ public class Screen extends JFrame implements ActionListener
    		if(action.getSource() == button2)
    		{
    			String input = textfield2.getText(); //Get inputed word.
+   			textfield2.setText("");
    			//Ensures user input is valid.
    			while(!input.matches("[a-zA-Z]+"))
    			{
@@ -467,7 +468,7 @@ public class Screen extends JFrame implements ActionListener
    		if(action.getSource() == button8)
    		{
    			String input = textfield2.getText();
-		   
+   			textfield2.setText("");
    			//Ensures correct user input.
    			while(!input.matches("[a-zA-Z]+"))
    			{
@@ -513,7 +514,7 @@ public class Screen extends JFrame implements ActionListener
    		{
    				
    			String input = textfield4.getText();
-		   
+   			textfield4.setText("");
    			//Ensures correct user input.
    			while(!input.matches("[a-zA-Z]+"))
 			{
@@ -553,6 +554,7 @@ public class Screen extends JFrame implements ActionListener
    		if(action.getSource() == button10)
    		{
    			String input = textfield4.getText();
+   			textfield4.setText("");
 				   
    			//Ensures correct user input.
    			while(!input.matches("[a-zA-Z]+"))
